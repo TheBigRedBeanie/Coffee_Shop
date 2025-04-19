@@ -1,0 +1,57 @@
+html {
+    background-color: #FDFDF3;
+    font-family: 'courier', sans-serif;
+}
+
+#logo {
+    display: block;
+    width: 125px;
+    height: 100px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+header h1 {
+    margin-left: auto;
+    margin-right: auto;
+    width: 125px;
+}
+
+.navbar {
+    display: flex;
+    justify-content: center;
+    position: sticky;
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.navbox {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #EFE5C8;
+    border-radius: 7px;
+    width: 100px;
+    height: 50px;
+}
+
+.navlink {
+    border-spacing: 10px;
+    list-style: none;
+    text-align: center;
+}
+
+.navlink a {
+    color: #B94B35;
+}
+
+.navlink a:hover {
+    color: #37593D;
+}
+
+/* background hex: #FDFDF3
+    text hex: #B94B35
+    hover hex: #37593D
+    box hex: #EFE5C8
+*/
