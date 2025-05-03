@@ -11,6 +11,51 @@ const validDiscount = [
 let discount = 1;
 let discountApplied = false;
 
+// getting user location
+function getUserLocation() {
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+          alert("Geolocation is not supported by this browser.");
+        }
+      }
+// store the position as lat and long variables
+      function showPosition(position) {
+        const lat = position.coords.latitude;
+        const long = position.coords.longitude;
+// log the locations into the console
+        console.log("Latitude: " + lat + ", Longitude: " + long);
+// call the weather API and pass the variables + api key 
+        const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=30e061c6bbcc3707c890ba56e5b98c94&units=imperial`;
+        fetch(weatherApiUrl)
+            .then(response => response.json())
+           .then(data => {
+             console.log("Weather data:", data);
+// log the response as the "data" into the console log
+           })
+           .catch(error => {
+            console.error("Error fetching weather data:", error);
+           });
+      }
+      
+      function showError(error) {
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            alert("User denied the request for Geolocation.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            alert("Location information is unavailable.");
+            break;
+          case error.TIMEOUT:
+            alert("The request to get user location timed out.");
+            break;
+          case error.UNKNOWN_ERROR:
+            alert("An unknown error occurred.");
+            break;
+        }
+      }
+
 
 
 // login
@@ -267,6 +312,6 @@ createMenu(data);
 //execute upon pageload
 document.addEventListener('DOMContentLoaded', function () {
     // createMenu();
-    // getUserLocation();
+    getUserLocation();
     getMenuFromServer();
 });
