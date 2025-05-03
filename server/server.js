@@ -1,5 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const {v4: uuidv4} = require('uuid');
+require('dotenv').config();
+const supabase = require('./db')
 
 const app = express();
 app.use(cors());
@@ -35,9 +38,45 @@ app.get('/getMenu', (req, res) => {
 });
 
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     console.log('gn2 /login', req.body)
-    // check user login
-    // res.json(user);
+    const username = req.body.username
+    const password = req.body.password
+    console.log('username', username)
+    console.log('password', password)
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: username,
+        password: password
+    });
+    if (error) {
+        console.error('Signin error', error);
+        return res.status(401).json({ error: error.message });
+    }
+    res.status(200).json({message: 'Success'})
 })
+
+
+const orderArray = [];
+app.post('/checkout', (req, res) => {
+    console.log('gn2 /checkout', req.body)
+    if(!req.body || req.body.length < 1){
+        res.status(400).json({ message: "At least one item required for order" });
+    }
+    const order = req.body;
+    console.log('order', order)
+    //put order in orderArray
+    orderArray.push(order);
+    console.log('orderArray', orderArray)
+    const confirmationNumber = '234jw2hjo2o2';
+    res.status(200).json({message: "Order Process Successfully", confirmationNumber: confirmationNumber})
+})
+
+const contactForm = [];
+app.post('/contact', (req, res) => {
+    contactForm.push(req.body)
+    console.log('gn2', contactForm);
+})
+
+
 app.listen(3000); 
+

@@ -15,13 +15,13 @@ let discountApplied = false;
 function getUserLocation() {
 
         if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(showPosition, showError);
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
         } else {
-          alert("Geolocation is not supported by this browser.");
+            alert("Geolocation is not supported by this browser.");
         }
-      }
+    }
 // store the position as lat and long variables
-      function showPosition(position) {
+    function showPosition(position) {
         const lat = position.coords.latitude;
         const long = position.coords.longitude;
 // log the locations into the console
@@ -30,31 +30,31 @@ function getUserLocation() {
         const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=30e061c6bbcc3707c890ba56e5b98c94&units=imperial`;
         fetch(weatherApiUrl)
             .then(response => response.json())
-           .then(data => {
-             console.log("Weather data:", data);
+        .then(data => {
+            console.log("Weather data:", data);
 // log the response as the "data" into the console log
-           })
-           .catch(error => {
+        })
+        .catch(error => {
             console.error("Error fetching weather data:", error);
-           });
-      }
-      
-      function showError(error) {
+        });
+    }
+    
+    function showError(error) {
         switch(error.code) {
-          case error.PERMISSION_DENIED:
+            case error.PERMISSION_DENIED:
             alert("User denied the request for Geolocation.");
             break;
-          case error.POSITION_UNAVAILABLE:
+            case error.POSITION_UNAVAILABLE:
             alert("Location information is unavailable.");
             break;
-          case error.TIMEOUT:
+            case error.TIMEOUT:
             alert("The request to get user location timed out.");
             break;
-          case error.UNKNOWN_ERROR:
+            case error.UNKNOWN_ERROR:
             alert("An unknown error occurred.");
             break;
         }
-      }
+    }
 
 
 
@@ -82,16 +82,16 @@ async function handleLogin(event) {
     }
 )
 
-    if (user.username !== username || user.password !== password) {
-        alert(`username/password not found`);
-        return;
-    } else {
-        loggedInUser = user;
-        console.log('loggedInUser', loggedInUser);
-    }
+    // if (user.username !== username || user.password !== password) {
+    //     alert(`username/password not found`);
+    //     return;
+    // } else {
+    //     loggedInUser = user;
+    //     console.log('loggedInUser', loggedInUser);
+    // }
 
     let welcomeMessageElement = document.getElementById('welcome-message');
-    welcomeMessageElement.innerText = `Welcome ${user.username}!`;
+    welcomeMessageElement.innerText = `Welcome ${username}!`;
 }
 
 // create menu
@@ -231,19 +231,48 @@ function removeQuantity(index) {
     }
 }
 
-// check out
-function checkout() {
+// // check out
+// function checkout() {
+//     if (cart.length === 0) {
+//         alert('your cart is empty!');
+//         return;
+//     }
+//     alert(
+//         `Thank you for your purchase, ${
+//             loggedInUser && loggedInUser.username
+//                 ? loggedInUser.username
+//                 : 'Human'
+//         }!`
+//     );
+//     cart.length = 0;
+//     updateCart();
+// }
+
+async function checkout() {
     if (cart.length === 0) {
-        alert('your cart is empty!');
+        alert('Your cart is empty!');
         return;
     }
-    alert(
-        `Thank you for your purchase, ${
-            loggedInUser && loggedInUser.username
-                ? loggedInUser.username
-                : 'Human'
-        }!`
-    );
+    console.log('cart in checkout', cart)
+    //get the cart array and pass it to server to be stored in orderArray
+    const response = await fetch('http://localhost:3000/checkout', 
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify(cart)
+        })
+        console.log('response', response)
+    
+        let responseJson = await response.json();
+        console.log('responseJson', responseJson)
+    
+        if(!response.ok){
+            alert(responseJson.message)
+        }
+        alert(`${responseJson.message}. Confirmation number: ${responseJson.confirmationNumber}`)
+    
     cart.length = 0;
     updateCart();
 }
@@ -304,14 +333,88 @@ let data = await response.json();
 console.log('data', data);
 
 createMenu(data);
+}
 
 
+// going to create the form on the page via javascript
+function createContactform(){
+    let formElement = document.createElement("form");
+    formElement.style.listStyleType = 'none';
+    formElement.innerHTML = `
+    <div class="contact-form">
+    <label for="first-name">First Name:</label> 
+    <input type="text" id="first-name" name="firstName>First Name</input><br>
+    <label for="last-name">Last Name:</label> 
+    <input type="text" id="last-name" name="firstName>Last Name</input> <br>
+    <label for="email">Email:</label>
+    <input type="test" id="email" name="email"></input> <br>
+    <label for="comment">Comment:</label> 
+    <textarea id="comment" name="comment"></textarea><br>
+    <button onclick="submitContact()">Submit</button>
+    </div>
+    `;
+
+    document.body.appendChild(formElement);
+}
+
+
+// submitting the contact data
+const contactNum = 0;
+async function submitContact() {
+    event.preventDefault();
+
+    const firstNameInput = document.getElementById("first-name");
+    const lastNameInput = document.getElementById("last-name");
+    const emailInput = document.getElementById("email");
+    const commentInput = document.getElementById("comment");
+
+    const formData = {
+        firstName: firstNameInput.value,
+        lastName: lastNameInput.value,
+        email: emailInput.value,
+        comment: commentInput.value,
+        contactID: `${contactNum}`
+    }
+
+    const response = await fetch('http://localhost:3000/contact', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+        });
+
+    console.log('response', response);
+    if(response.status != 200) {
+        console.error('response error');
+            return;
+    }
+    let message = await response.json();
+    console.log('message', message);
+    contactNum++;
 
 }
+    // if(menu && menu.length > 0){
+    //     for (let i = 0; i < menu.length; i++) {
+    //         const liElement = document.createElement('li')
+    //         liElement.innerHTML = `
+    //         <div class="menu-item">
+    //         <span id="${menu[i].name}">${menu[i].name}</span>
+    //         <button onclick="addToCart('${menu[i].name}', '${menu[i].price.toFixed(2)}')">Add To Cart ($${menu[i].price.toFixed(2)})</button>
+
+    //         </div>
+    //     `;
+    //     ulElement.appendChild(liElement);
+    //     }
+    // }
+
+
+
 
 //execute upon pageload
 document.addEventListener('DOMContentLoaded', function () {
     // createMenu();
     getUserLocation();
     getMenuFromServer();
+    createContactform();
 });
