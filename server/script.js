@@ -340,17 +340,18 @@ createMenu(data);
 function createContactform(){
     let formElement = document.createElement("form");
     formElement.style.listStyleType = 'none';
+    formElement.onsubmit = submitContact;
     formElement.innerHTML = `
     <div class="contact-form">
     <label for="first-name">First Name:</label> 
-    <input type="text" id="first-name" name="firstName>First Name</input><br>
+    <input type="text" id="first-name" name="firstName">First Name</input><br>
     <label for="last-name">Last Name:</label> 
-    <input type="text" id="last-name" name="firstName>Last Name</input> <br>
+    <input type="text" id="last-name" name="lastName">Last Name</input> <br>
     <label for="email">Email:</label>
     <input type="test" id="email" name="email"></input> <br>
     <label for="comment">Comment:</label> 
     <textarea id="comment" name="comment"></textarea><br>
-    <button onclick="submitContact()">Submit</button>
+    <button type="submit">Submit</button>
     </div>
     `;
 
@@ -359,8 +360,7 @@ function createContactform(){
 
 
 // submitting the contact data
-const contactNum = 0;
-async function submitContact() {
+async function submitContact(event) {
     event.preventDefault();
 
     const firstNameInput = document.getElementById("first-name");
@@ -372,8 +372,7 @@ async function submitContact() {
         firstName: firstNameInput.value,
         lastName: lastNameInput.value,
         email: emailInput.value,
-        comment: commentInput.value,
-        contactID: `${contactNum}`
+        comment: commentInput.value
     }
 
     const response = await fetch('http://localhost:3000/contact', {
@@ -391,7 +390,13 @@ async function submitContact() {
     }
     let message = await response.json();
     console.log('message', message);
-    contactNum++;
+
+    console.log('clearing the fields...');
+    firstNameInput.value = '';
+    lastNameInput.value = '';
+    emailInput.value = '';
+    commentInput.value = '';
+    console.log('fields should be cleared.');
 
 }
     // if(menu && menu.length > 0){

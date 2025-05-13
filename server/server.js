@@ -13,27 +13,23 @@ app.use(express.urlencoded({ extended: true })); // for parsing application/x-ww
 const user = { username: 'jon', password: 'pass123' };
 
 
-// menu
-const menu = [
-    {
-        name: 'Americano',
-        price: 2.5,
-        type: 'hot',
-    },
-    { name: 'Latte', price: 3.0, type: 'hot' },
-    { name: 'Cappuccino', price: 3.5, type: 'hot' },
-    { name: 'Frozen Americano', price: 4.5, type: 'cold' },
-    { name: 'Frozen Latte', price: 2.5, type: 'cold' },
-    { name: 'Pup Cup', price: 0, type: 'cold' },
-];
 
 app.get('/', (req, res) => {
     res.send('Hello World');
 });
 
-app.get('/getMenu', (req, res) => {
-    console.log('gn2 /getMenu');
-    // reach out to db to get the menu
+app.get('/getMenu', async (req, res) => {
+    const {data: menu, error } = await supabase
+    .from('menu')
+    .select()
+
+    if (error){
+        console.error('error', error)
+        return res.status(500).json({ error: error.message})
+    }
+
+    console.log('menu', menu)
+    console.error('error', error)
     res.json(menu);
 });
 
@@ -72,10 +68,37 @@ app.post('/checkout', (req, res) => {
 })
 
 const contactForm = [];
-app.post('/contact', (req, res) => {
+app.post('/contact', async (req, res) => {
     contactForm.push(req.body)
     console.log('gn2', contactForm);
+
+const messageObj = req.body;
+    const { data, error } = await supabase 
+        .from('contact_form_messages')
+        .insert([
+            {
+                    first_name: messageObj.firstName,
+                    last_name: messageObj.lastName,
+                    email: messageObj.email,
+                    comment: messageObj.comment,
+            }
+        ])
+
+    const { data: insertedData, error: fetchError } = await supabase
+    .from('contact_form_messages')
+    .select()
+    .eq('email', messageObj.email); // Filter by a unique field like email
+
+if (fetchError) {
+    console.error('Fetch error:', fetchError);
+} else {
+    console.log('Fetched data:', insertedData);
+}
+
+
+res.status(200).json({message: "message received successfully"})
 })
+
 
 
 app.listen(3000); 
